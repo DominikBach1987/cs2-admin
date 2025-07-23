@@ -26,11 +26,14 @@ public class BaseChat : BasePlugin, IPluginConfig<Config>
         Instance = this;
 
         AddCommandListener("say_team", Command_SayTeam, HookMode.Pre);
+        AddCommandListener("say", OnChatHugCommand, HookMode.Pre); //<<Hier
+
     }
 
     public override void Unload(bool hotReload)
     {
         RemoveCommandListener("say_team", Command_SayTeam, HookMode.Pre);
+        RemoveCommandListener("say", OnChatHugCommand, HookMode.Pre); //<<Hier
     }
 
     public void OnConfigParsed(Config config)
@@ -137,6 +140,83 @@ public class BaseChat : BasePlugin, IPluginConfig<Config>
         }
 
         SendMessageToAdmins(username, message);
+        return HookResult.Stop;
+    }
+    // Console command: css_hug
+    // Allows an admin to send a hug to a player via console or command line
+    [ConsoleCommand("css_hug")]
+    [RequiresPermissions("@css/chat")]
+    [CommandHelper(minArgs: 1, usage: "hug_usage")]
+    public void Command_Hug(CCSPlayerController? player, CommandInfo info)
+    {
+        string[] args = info.ArgString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        // Find the target player using input
+        TargetResult targetResult = new Target(args[0]).GetTarget(player);
+
+        if (targetResult.Players.Count == 0)
+        {
+            // No player found
+            SendMessageToReplyToCommand(info, true, "hug_no_target");
+            return;
+        }
+        else if (targetResult.Players.Count > 1)
+        {
+            // More than one player matched
+            SendMessageToReplyToCommand(info, true, "hug_too_many");
+            return;
+        }
+
+        // Send hug message
+        CCSPlayerController target = targetResult.Players[0];
+        string sender = player?.PlayerName ?? "Console";
+        string targetName = target.PlayerName;
+
+        SendMessageToAllPlayers(HudDestination.Chat, "hug_message", sender, targetName);
+    }
+
+    // Chat command: /hug
+    // Allows a player to hug someone by typing "/hug <name>" in chat
+    public HookResult OnChatHugCommand(CCSPlayerController? player, CommandInfo info)
+    {
+        string arg = info.ArgString.Trim('"');
+
+        // Only continue if the message starts with "/hug "
+        if (!arg.StartsWith("/hug "))
+        {
+            return HookResult.Continue;
+        }
+
+        // Get name from input
+        string[] args = arg.Substring(5).Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (args.Length == 0)
+        {
+            // No input given after /hug
+            SendMessageToPlayer(player, HudDestination.Chat, "hug_usage");
+            return HookResult.Stop;
+        }
+
+        // Try to find the target player
+        TargetResult targetResult = new Target(args[0]).GetTarget(player);
+
+        if (targetResult.Players.Count == 0)
+        {
+            SendMessageToPlayer(player, HudDestination.Chat, "hug_no_target");
+            return HookResult.Stop;
+        }
+        else if (targetResult.Players.Count > 1)
+        {
+            SendMessageToPlayer(player, HudDestination.Chat, "hug_too_many");
+            return HookResult.Stop;
+        }
+
+        // Target is found → send hug message
+        CCSPlayerController target = targetResult.Players[0];
+        string sender = player?.PlayerName ?? "Console";
+        string targetName = target.PlayerName;
+
+        SendMessageToAllPlayers(HudDestination.Chat, "hug_message", sender, targetName);
         return HookResult.Stop;
     }
 }

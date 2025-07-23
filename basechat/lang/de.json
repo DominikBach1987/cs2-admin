@@ -1,0 +1,6 @@
+{
+  "hug_message": "{0} umarmt {1} herzlich!",
+  "hug_no_target": "Kein Spieler gefunden.",
+  "hug_too_many": "Mehrere Spieler gefunden.",
+  "hug_usage": "<#userid|name> - gibt einem Spieler eine Umarmung"
+}

@@ -7,5 +7,11 @@
   "css_csay": "{0}: {1}",
   "css_hsay": "{0}: {1}",
   "css_asay": "{red}[ADMINS] {blue}{0}{white}: {green}{1}",
-  "css_psay": "{white}[{blue}{0} {white}-> {blue}{1}{white}]: {green}{2}"
+  "css_psay": "{white}[{blue}{0} {white}-> {blue}{1}{white}]: {green}{2}",
+  "hug_message": "{0} hugs {1} warmly!",
+  "hug_no_target": "No matching player found.",
+  "hug_too_many": "More than one player matched.",
+  "hug_usage": "<#userid|name> - sends a hug to another player"
+
+
 }
